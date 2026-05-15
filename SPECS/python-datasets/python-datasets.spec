@@ -7,16 +7,20 @@
 %global srcname datasets
 
 Name:           python-datasets
-Version:        4.8.3
+Version:        4.8.5
 Release:        %autorelease
 Summary:        Library for accessing and sharing machine learning datasets
 License:        MIT
 URL:            https://pypi.org/project/datasets/
 VCS:            git:https://github.com/huggingface/datasets
-#!RemoteAsset:  sha256:882fb1bb514772bec17fbcad2e32985893954d0a0ecf42266e5091386be1f3b7
+#!RemoteAsset:  sha256:0f0c1c3d56ffff2c93b2f4c63c95bac94f3d7e8621aea2a2a576275233bba772
 Source0:        https://files.pythonhosted.org/packages/source/d/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    pyproject
+
+# NOTE: When updating datasets, please check this URL:
+# https://github.com/huggingface/datasets/issues/7326
+Patch2000:      2000-Relax-fsspec-version-requirements.patch
 
 BuildOption(install):  -l %{srcname} +auto
 BuildOption(check):  -e datasets.io.spark -e 'datasets.packaged_modules.spark*'
