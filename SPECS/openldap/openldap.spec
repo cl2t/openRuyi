@@ -11,15 +11,15 @@
 %global _lto_cflags %{_lto_cflags} -ffat-lto-objects
 
 Name:           openldap
-Version:        2.6.12
+Version:        2.6.13
 Release:        %autorelease
 Summary:        An implementation of the Lightweight Directory Access Protocol
 License:        OLDAP-2.8
 URL:            https://www.openldap.org
 VCS:            git:https://git.openldap.org/openldap/openldap.git
-#!RemoteAsset:  sha256:1716ad779e85d743694c3e3b05277fb71b6a5eadca43c7a958aa62683b22208e
+#!RemoteAsset:  sha256:d693b49517a42efb85a1a364a310aed16a53d428d1b46c0d31ef3fba78fcb656
 Source0:        https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-%{version}.tgz
-#!RemoteAsset:  sha256:0b5033258e50291486480c551aad10823d662d723037954042b14a360da48d2f
+#!RemoteAsset:  sha256:9e9317a322ba4b01a125fe4e292b6862d753696f1487839066eb0ccbaa599c5c
 Source1:        https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-%{version}.tgz.asc
 Source2:        slapd.conf
 Source3:        sasl-slapd.conf
@@ -75,6 +75,7 @@ BuildRequires:  pkgconfig(libargon2)
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  db-devel
 BuildRequires:  mandoc
+BuildRequires:  perl-devel
 BuildRequires:  libtool
 BuildRequires:  unixODBC-devel
 BuildRequires:  pkgconfig(krb5)
