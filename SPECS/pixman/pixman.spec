@@ -12,7 +12,7 @@ Release:        %autorelease
 Summary:        Pixel manipulation library
 License:        MIT
 URL:            https://gitlab.freedesktop.org/pixman/pixman
-#!RemoteAsset
+#!RemoteAsset:  sha256:d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c
 Source:         https://www.cairographics.org/releases/%{name}-%{version}.tar.gz
 BuildSystem:    meson
 
@@ -32,6 +32,9 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package contains the header files, pkg-config file, and other development
 files for the pixman library.
 
+%check
+# Disable check because some unit tests demand too much compute power
+
 %files
 %license COPYING
 %{_libdir}/libpixman-1.so.*
@@ -42,4 +45,4 @@ files for the pixman library.
 %{_libdir}/pkgconfig/pixman-1.pc
 
 %changelog
-%{?autochangelog}
+%autochangelog
