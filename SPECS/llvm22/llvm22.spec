@@ -118,6 +118,7 @@ BuildRequires:  python3dist(nanobind)
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(pip)
 BuildRequires:  python3dist(psutil)
+BuildRequires:  python3dist(pexpect)
 BuildRequires:  pyproject-rpm-macros
 # for tests
 BuildRequires:  perl(Digest::MD5)
@@ -144,8 +145,8 @@ tools as well as libraries with equivalent functionality.
 
 %package     -n llvm%{maj_ver}-devel
 Summary:        Libraries and header files for LLVM (%{maj_ver})
-Requires:       llvm%{maj_ver} = %{version}-%{release}
-Requires:       llvm%{maj_ver}-libs = %{version}-%{release}
+Requires:       llvm%{maj_ver}%{?_isa} = %{version}-%{release}
+Requires:       llvm%{maj_ver}-libs%{?_isa} = %{version}-%{release}
 # The installed LLVM cmake files will add -ledit to the linker flags for any
 # app that requires the libLLVMLineEditor, so we need to make sure
 # libedit-devel is available.
@@ -153,7 +154,7 @@ Requires:       pkgconfig(libedit)
 Requires:       pkgconfig(libzstd)
 # The installed cmake files reference binaries from llvm-test, llvm-static, and
 # llvm-gtest.
-Requires:       llvm%{maj_ver}-static = %{version}-%{release}
+Requires:       llvm%{maj_ver}-static%{?_isa} = %{version}-%{release}
 Provides:       llvm-devel(major) = %{maj_ver}
 
 %description -n llvm%{maj_ver}-devel
@@ -184,7 +185,7 @@ This is for internal use by LLVM packages only.
 Summary:        A C language family front-end for LLVM (%{maj_ver})
 Requires:       clang%{maj_ver}-libs%{?_isa} = %{version}-%{release}
 # clang requires gcc, clang++ requires libstdc++-devel
-Requires:       libstdc++-devel
+Requires:       libstdc++-devel%{?_isa}
 Provides:       clang(major) = %{maj_ver}
 
 %description -n clang%{maj_ver}
@@ -212,7 +213,7 @@ Runtime library for clang.
 
 %package     -n clang%{maj_ver}-devel
 Summary:        Development header files for clang (%{maj_ver})
-Requires:       clang%{maj_ver}-libs = %{version}-%{release}
+Requires:       clang%{maj_ver}-libs%{?_isa} = %{version}-%{release}
 Requires:       clang%{maj_ver}%{?_isa} = %{version}-%{release}
 # The clang CMake files reference tools from clang-tools-extra.
 Requires:       clang%{maj_ver}-tools-extra%{?_isa} = %{version}-%{release}
@@ -234,7 +235,7 @@ Static libraries for Clang.
 %package     -n clang%{maj_ver}-analyzer
 Summary:        A source code analysis framework (%{maj_ver})
 License:        Apache-2.0 WITH LLVM-exception OR NCSA OR MIT
-Requires:       clang%{maj_ver} = %{version}-%{release}
+Requires:       clang%{maj_ver}%{?_isa} = %{version}-%{release}
 
 %description -n clang%{maj_ver}-analyzer
 The Clang Static Analyzer consists of both a source code analysis
@@ -251,7 +252,7 @@ A set of extra tools built using Clang's tooling API.
 
 %package     -n clang%{maj_ver}-tools-extra-devel
 Summary:        Development header files for clang tools (%{maj_ver})
-Requires:       clang%{maj_ver}-tools-extra = %{version}-%{release}
+Requires:       clang%{maj_ver}-tools-extra%{?_isa} = %{version}-%{release}
 
 %description -n clang%{maj_ver}-tools-extra-devel
 Development header files for clang tools.
@@ -316,8 +317,6 @@ OpenMP header files.
 
 %package      -n lld%{maj_ver}
 Summary:        The LLVM Linker (%{maj_ver})
-Requires(post):  chkconfig
-Requires(preun): chkconfig
 Provides:        lld(major) = %{maj_ver}
 
 %description -n lld%{maj_ver}
@@ -337,7 +336,7 @@ Summary:        Next generation high-performance debugger (%{maj_ver})
 License:        Apache-2.0 WITH LLVM-exception OR NCSA
 URL:            http://lldb.llvm.org/
 Requires:       clang%{maj_ver}-libs%{?_isa} = %{version}-%{release}
-Requires:       python3-lldb
+Recommends:     python3-lldb%{maj_ver}%{?_isa} = %{version}-%{release}
 
 %description -n lldb%{maj_ver}
 LLDB is a next generation, high-performance debugger. It is built as a set
@@ -352,18 +351,20 @@ Requires:       lldb%{maj_ver}%{?_isa} = %{version}-%{release}
 %description -n lldb%{maj_ver}-devel
 The package contains header files for the LLDB debugger.
 
-%package     -n python3-lldb
+%package     -n python3-lldb%{maj_ver}
 Summary:        Python module for LLDB (%{maj_ver})
 Requires:       lldb%{maj_ver}%{?_isa} = %{version}-%{release}
+Obsoletes:      python3-lldb < %{version}-%{release}
+Conflicts:      python3-lldb < %{version}-%{release}
 
-%description -n python3-lldb
+%description -n python3-lldb%{maj_ver}
 The package contains the LLDB Python module.
 
 %package     -n mlir%{maj_ver}
 Summary:        Multi-Level Intermediate Representation Overview (%{maj_ver})
 License:        Apache-2.0 WITH LLVM-exception
 URL:            http://mlir.llvm.org
-Requires:       llvm%{maj_ver}-libs = %{version}-%{release}
+Requires:       llvm%{maj_ver}-libs%{?_isa} = %{version}-%{release}
 
 %description -n mlir%{maj_ver}
 The MLIR project is a novel approach to building reusable and extensible
@@ -408,7 +409,7 @@ This package contains LLVM version %{maj_ver}.
 %package     -n libcxx%{maj_ver}-devel
 Summary:        Headers and libraries for libcxx%{maj_ver} development
 Requires:       libcxx%{maj_ver}%{?_isa} = %{version}-%{release}
-Requires:       libcxxabi%{maj_ver}-devel
+Requires:       libcxxabi%{maj_ver}-devel%{?_isa}
 
 %description -n libcxx%{maj_ver}-devel
 Headers and libraries for libcxx%{maj_ver} development.
@@ -456,8 +457,8 @@ This package contains LLVM version %{maj_ver}.
 
 %package     -n llvm-libunwind%{maj_ver}-devel
 Summary:        LLVM libunwind development files (version %{maj_ver})
-Provides:       llvm-libunwind(major) = %{maj_ver}
 Requires:       llvm-libunwind%{maj_ver}%{?_isa} = %{version}-%{release}
+Provides:       llvm-libunwind(major) = %{maj_ver}
 
 %description -n llvm-libunwind%{maj_ver}-devel
 Development files for LLVM libunwind version %{maj_ver}.
@@ -568,7 +569,9 @@ OLD_CWD="$PWD"
     -DLLVM_BUILD_DOCS:BOOL=OFF
 
 # lldb options
-%global cmake_config_args %{cmake_config_args} -DLLDB_ENFORCE_STRICT_TEST_REQUIREMENTS:BOOL=ON
+%global cmake_config_args %{cmake_config_args} \\\
+    -DLLDB_ENFORCE_STRICT_TEST_REQUIREMENTS:BOOL=ON \\\
+    -DLLDB_PYTHON_RELATIVE_PATH=lib/python%{python3_version}/site-packages
 
 # libcxx options
 %global cmake_config_args %{cmake_config_args}  \\\
@@ -707,8 +710,6 @@ done
 popd
 
 mkdir -p %{buildroot}/%{install_python3mod}
-#FIXME: why lldb install python mod here?
-mv -f %{buildroot}/%{install_prefix}/lib64/python%{python3_version}/site-packages/* %{buildroot}/%{install_python3mod}
 cp -a clang/bindings/python/clang %{buildroot}/%{install_python3mod}
 mv -f %{buildroot}/%{install_prefix}/python_packages/mlir_core/mlir %{buildroot}/%{install_python3mod}
 
@@ -719,14 +720,6 @@ rm -f %{buildroot}/%{install_libdir}/libllvm_gtest*
 
 %check
 # it takes days to complete the testing. Let's just disable it for now.
-
-%post -n lld%{maj_ver}
-update-alternatives --install %{_bindir}/ld ld %{_bindir}/ld.lld 1
-
-%postun -n lld%{maj_ver}
-if [ $1 -eq 0 ] ; then
-  update-alternatives --remove ld %{_bindir}/ld.lld
-fi
 
 %define expand_bins() %{lua:
   local bindir = rpm.expand("%{_bindir}")
@@ -1101,7 +1094,7 @@ fi
     yaml2macho-core
 }}
 
-%files -n python3-lldb
+%files -n python3-lldb%{maj_ver}
 %{install_python3mod}/lldb
 
 %files -n mlir%{maj_ver}
