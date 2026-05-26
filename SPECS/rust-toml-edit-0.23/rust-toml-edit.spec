@@ -36,7 +36,7 @@ Requires:       crate(%{pkgname})
 Requires:       crate(%{pkgname}/display)
 Requires:       crate(anstream-0.6/default) >= 0.6.20
 Requires:       crate(anstyle-1.0/default) >= 1.0.11
-Requires:       crate(toml-parser-1.0/debug) >= 1.1.2
+Requires:       crate(toml-parser-1.1.2/debug) >= 1.1.2
 Provides:       crate(%{pkgname}/debug)
 
 %description -n %{name}+debug
@@ -55,7 +55,7 @@ This metapackage enables feature "default" for the Rust toml_edit crate, by pull
 %package     -n %{name}+display
 Summary:        Yet another format-preserving TOML parser - feature "display"
 Requires:       crate(%{pkgname})
-Requires:       crate(toml-writer-1.0/default) >= 1.1.1
+Requires:       crate(toml-writer-1.1.1/default) >= 1.1.1
 Provides:       crate(%{pkgname}/display)
 
 %description -n %{name}+display
@@ -64,7 +64,7 @@ This metapackage enables feature "display" for the Rust toml_edit crate, by pull
 %package     -n %{name}+parse
 Summary:        Yet another format-preserving TOML parser - feature "parse"
 Requires:       crate(%{pkgname})
-Requires:       crate(toml-parser-1.0/default) >= 1.1.2
+Requires:       crate(toml-parser-1.1.2/default) >= 1.1.2
 Requires:       crate(winnow-0.7/default) >= 0.7.15
 Provides:       crate(%{pkgname}/parse)
 
@@ -75,8 +75,8 @@ This metapackage enables feature "parse" for the Rust toml_edit crate, by pullin
 Summary:        Yet another format-preserving TOML parser - feature "serde"
 Requires:       crate(%{pkgname})
 Requires:       crate(serde-core-1.0/default) >= 1.0.228
-Requires:       crate(serde-spanned-1.0/default) >= 1.1.1
-Requires:       crate(serde-spanned-1.0/serde) >= 1.1.1
+Requires:       crate(serde-spanned-1.1.1/default) >= 1.1.1
+Requires:       crate(serde-spanned-1.1.1/serde) >= 1.1.1
 Requires:       crate(toml-datetime-0.7/serde) >= 0.7.5
 Provides:       crate(%{pkgname}/serde)
 
