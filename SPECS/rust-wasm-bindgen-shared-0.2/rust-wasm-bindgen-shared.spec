@@ -4,20 +4,17 @@
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
-%global debug_package %{nil}
-%global __debug_install_post %{nil}
-
 %global crate_name wasm-bindgen-shared
-%global full_version 0.2.118
+%global full_version 0.2.121
 %global pkgname wasm-bindgen-shared-0.2
 
 Name:           rust-wasm-bindgen-shared-0.2
-Version:        0.2.118
+Version:        0.2.121
 Release:        %autorelease
 Summary:        Rust crate "wasm-bindgen-shared"
 License:        MIT OR Apache-2.0
 URL:            https://wasm-bindgen.github.io/wasm-bindgen/
-#!RemoteAsset:  sha256:5fd04d9e306f1907bd13c6361b5c6bfc7b3b3c095ed3f8a9246390f8dbdee129
+#!RemoteAsset:  sha256:c4e0100b01e9f0d03189a92b96772a1fb998639d981193d7dbab487302513441
 Source:         https://crates.io/api/v1/crates/%{crate_name}/%{full_version}/download#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    rustcrates
@@ -25,6 +22,7 @@ BuildSystem:    rustcrates
 BuildRequires:  rust-rpm-macros
 
 Requires:       crate(unicode-ident-1.0/default) >= 1.0.24
+Provides:       crate(wasm-bindgen-shared) = %{version}
 Provides:       crate(%{pkgname})
 Provides:       crate(%{pkgname}/default)
 
