@@ -27,10 +27,10 @@ BuildRequires:  go
 BuildRequires:  go-rpm-macros
 BuildRequires:  go(github.com/golang-jwt/jwt/v5)
 BuildRequires:  go(github.com/google/uuid)
-BuildRequires:  go(github.com/kylelemons/godebug/diff)
-BuildRequires:  go(github.com/kylelemons/godebug/pretty)
+BuildRequires:  go(github.com/kylelemons/godebug)
 BuildRequires:  go(github.com/pkg/browser)
 
+Provides:       go(github.com/AzureAD/microsoft-authentication-library-for-go) = %{version}
 Provides:       go(github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache) = %{version}
 Provides:       go(github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential) = %{version}
 Provides:       go(github.com/AzureAD/microsoft-authentication-library-for-go/apps/errors) = %{version}
@@ -39,8 +39,7 @@ Provides:       go(github.com/AzureAD/microsoft-authentication-library-for-go/ap
 
 Requires:       go(github.com/golang-jwt/jwt/v5)
 Requires:       go(github.com/google/uuid)
-Requires:       go(github.com/kylelemons/godebug/diff)
-Requires:       go(github.com/kylelemons/godebug/pretty)
+Requires:       go(github.com/kylelemons/godebug)
 Requires:       go(github.com/pkg/browser)
 
 %description
