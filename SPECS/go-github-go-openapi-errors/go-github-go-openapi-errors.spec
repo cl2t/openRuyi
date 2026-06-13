@@ -32,8 +32,8 @@ errors, and HTTP status helpers). It is a runtime dependency of
 go-openapi/strfmt, which Prometheus uses.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

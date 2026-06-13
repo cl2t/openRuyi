@@ -7,6 +7,11 @@
 %define _name           strfmt
 %define go_import_path  github.com/go-openapi/strfmt
 
+# The optional MongoDB integration (enable/mongodb) imports the unpackaged
+# go.mongodb.org/mongo-driver and is not used by Prometheus (strfmt's core
+# uses its internal bsonlite). Exclude it; all other tests still run.
+%global go_test_exclude_glob */enable/mongodb*
+
 Name:           go-github-go-openapi-strfmt
 Version:        0.26.2
 Release:        %autorelease
@@ -17,11 +22,6 @@ URL:            https://github.com/go-openapi/strfmt
 Source0:        https://github.com/go-openapi/strfmt/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
-
-# The optional MongoDB integration (enable/mongodb) imports the unpackaged
-# go.mongodb.org/mongo-driver and is not used by Prometheus (strfmt's core
-# uses its internal bsonlite). Exclude it; all other tests still run.
-%global go_test_exclude_glob */enable/mongodb*
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
@@ -48,8 +48,8 @@ This package provides a set of OpenAPI/Swagger string-format helpers
 projects for marshalling and validating typed string values.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

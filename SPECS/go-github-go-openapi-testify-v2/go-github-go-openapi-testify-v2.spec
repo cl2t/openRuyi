@@ -7,6 +7,12 @@
 %define _name           testify
 %define go_import_path  github.com/go-openapi/testify/v2
 
+# Only assert and require are consumed by errors/strfmt, and they are
+# self-contained (spew/difflib vendored in ./internal). The optional enable/*,
+# codegen and hack trees pull in golang.org/x/term, yaml, golang.org/x/tools
+# etc.; scope the test run to the self-contained core that we ship for.
+%global go_test_include github.com/go-openapi/testify/v2/assert github.com/go-openapi/testify/v2/require
+
 Name:           go-github-go-openapi-testify-v2
 Version:        2.4.2
 Release:        %autorelease
@@ -17,12 +23,6 @@ URL:            https://github.com/go-openapi/testify
 Source0:        https://github.com/go-openapi/testify/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
-
-# Only assert and require are consumed by errors/strfmt, and they are
-# self-contained (spew/difflib vendored in ./internal). The optional enable/*,
-# codegen and hack trees pull in golang.org/x/term, yaml, golang.org/x/tools
-# etc.; scope the test run to the self-contained core that we ship for.
-%global go_test_include github.com/go-openapi/testify/v2/assert github.com/go-openapi/testify/v2/require
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
@@ -44,8 +44,8 @@ and difflib vendored internally) used by the test suites of
 go-openapi/errors and go-openapi/strfmt.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

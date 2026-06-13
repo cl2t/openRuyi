@@ -7,6 +7,11 @@
 %define _name           go-vcr
 %define go_import_path  github.com/dnaeon/go-vcr
 
+# go-vcr is a test helper used by the Azure SDK resource-manager tests.
+# Its own test suite ships a bundled vendor/ tree that is ignored in GOPATH
+# mode; run the tests but tolerate failures from that layout mismatch.
+%global go_test_ignore_failure 1
+
 Name:           go-github-dnaeon-go-vcr
 Version:        1.2.0
 Release:        %autorelease
@@ -17,11 +22,6 @@ URL:            https://github.com/dnaeon/go-vcr
 Source0:        https://github.com/dnaeon/go-vcr/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
-
-# go-vcr is a test helper used by the Azure SDK resource-manager tests.
-# Its own test suite ships a bundled vendor/ tree that is ignored in GOPATH
-# mode; run the tests but tolerate failures from that layout mismatch.
-%global go_test_ignore_failure 1
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
@@ -38,8 +38,8 @@ allowing HTTP-based clients to be tested deterministically without a live
 server. It is a test dependency of the Azure SDK resource-manager modules.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

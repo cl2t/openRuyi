@@ -57,8 +57,8 @@ OpenStack Identity, Compute, Networking and Load Balancer APIs and is
 used by Prometheus' OpenStack service discovery.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

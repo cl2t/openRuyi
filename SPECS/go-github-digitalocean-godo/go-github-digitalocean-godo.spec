@@ -7,17 +7,6 @@
 %define _name           godo
 %define go_import_path  github.com/digitalocean/godo
 
-Name:           go-github-digitalocean-godo
-Version:        1.193.0
-Release:        %autorelease
-Summary:        DigitalOcean Go API client
-License:        MIT
-URL:            https://github.com/digitalocean/godo
-#!RemoteAsset:  sha256:14ab852e944f8f18ce5ea2c52fe76d8fe4c53ffad18128626ee82adaff1b13ce
-Source0:        https://github.com/digitalocean/godo/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
-BuildArch:      noarch
-BuildSystem:    golangmodules
-
 # Upstream tests need adjustments for a newer Go toolchain:
 #  - they use non-constant format strings rejected by newer `go vet`;
 #  - they ship example main programs that are not part of the library;
@@ -30,6 +19,17 @@ BuildSystem:    golangmodules
 %global go_test_flags_default -v -vet=off
 %global go_test_exclude_glob */examples/*
 %global go_test_ignore_failure 1
+
+Name:           go-github-digitalocean-godo
+Version:        1.193.0
+Release:        %autorelease
+Summary:        DigitalOcean Go API client
+License:        MIT
+URL:            https://github.com/digitalocean/godo
+#!RemoteAsset:  sha256:14ab852e944f8f18ce5ea2c52fe76d8fe4c53ffad18128626ee82adaff1b13ce
+Source0:        https://github.com/digitalocean/godo/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
+BuildArch:      noarch
+BuildSystem:    golangmodules
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
@@ -54,8 +54,8 @@ It exposes services for managing Droplets, Kubernetes, Volumes, the
 Container Registry, and the Gradient AI inference endpoints.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

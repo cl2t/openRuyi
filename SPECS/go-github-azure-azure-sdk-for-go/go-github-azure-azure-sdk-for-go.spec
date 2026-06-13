@@ -157,8 +157,8 @@ for mod in \
 done
 
 %files
-%license %{dir_azcore}/sdk/azcore/LICENSE.txt
 %doc %{dir_azcore}/sdk/azcore/README.md
+%license %{dir_azcore}/sdk/azcore/LICENSE.txt
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog

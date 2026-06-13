@@ -7,6 +7,11 @@
 %define _name           microsoft-authentication-library-for-go
 %define go_import_path  github.com/AzureAD/microsoft-authentication-library-for-go
 
+# MSAL is a runtime dependency of the Azure SDK's azidentity. Its test suite
+# reaches beyond the runtime deps below (local HTTP servers, extra fixtures);
+# run the tests but tolerate failures from fixtures we do not ship.
+%global go_test_ignore_failure 1
+
 Name:           go-github-azuread-microsoft-authentication-library-for-go
 Version:        1.6.0
 Release:        %autorelease
@@ -17,11 +22,6 @@ URL:            https://github.com/AzureAD/microsoft-authentication-library-for-
 Source0:        https://github.com/AzureAD/microsoft-authentication-library-for-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
-
-# MSAL is a runtime dependency of the Azure SDK's azidentity. Its test suite
-# reaches beyond the runtime deps below (local HTTP servers, extra fixtures);
-# run the tests but tolerate failures from fixtures we do not ship.
-%global go_test_ignore_failure 1
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
@@ -49,8 +49,8 @@ It is the runtime authentication backend used by the Azure SDK's azidentity
 module, which Prometheus' Azure service discovery depends on.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
