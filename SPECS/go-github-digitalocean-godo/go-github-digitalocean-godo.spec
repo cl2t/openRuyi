@@ -17,12 +17,12 @@
 %global go_test_ignore_failure 1
 
 Name:           go-github-digitalocean-godo
-Version:        1.193.0
+Version:        1.196.0
 Release:        %autorelease
 Summary:        DigitalOcean Go API client
 License:        MIT
 URL:            https://github.com/digitalocean/godo
-#!RemoteAsset:  sha256:14ab852e944f8f18ce5ea2c52fe76d8fe4c53ffad18128626ee82adaff1b13ce
+#!RemoteAsset:  sha256:028029cfe82baae6d82ec6133cfde4d21ff242eeda4382205277af936f17caee
 Source0:        https://github.com/digitalocean/godo/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
