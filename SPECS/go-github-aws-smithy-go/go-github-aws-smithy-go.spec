@@ -6,18 +6,17 @@
 
 %define _name           smithy-go
 %define go_import_path  github.com/aws/smithy-go
-%define package_version 2025-12-01
 # TODO: Test need too much dependencies, add it later - Julian
 %define go_test_ignore_failure 1
 
 Name:           go-github-aws-smithy-go
-Version:        2025.12.01
+Version:        1.27.2
 Release:        %autorelease
 Summary:        Smithy code generators for Go (in development)
 License:        Apache-2.0
 URL:            https://github.com/aws/smithy-go
-#!RemoteAsset
-Source0:        https://github.com/aws/smithy-go/archive/refs/tags/release-%{package_version}.tar.gz#/%{_name}-%{package_version}.tar.gz
+#!RemoteAsset:  sha256:b3ea155006f03a08edc63260c3f276250132b38e14569ade334f1137baa8f2f3
+Source0:        https://github.com/aws/smithy-go/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
@@ -30,9 +29,9 @@ Provides:       go(github.com/aws/smithy-go) = %{version}
 Smithy code generators for Go and the accompanying smithy-go runtime.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog
