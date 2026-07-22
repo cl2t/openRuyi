@@ -1,0 +1,85 @@
+From c3855c9e00537f4b655349fe1ea986f1a09e4586 Mon Sep 17 00:00:00 2001
+From: Dmitri Shuralyov <dmitshur@golang.org>
+Date: Tue, 26 May 2026 19:08:28 -0400
+Subject: [PATCH] typeparams: consider String methods optional
+
+TestAPIConsistency correctly reports at Go tip that String methods
+on the TypeList, TypeParamList, and Instance types are inconsistent.
+They were added in Go 1.27 as part of proposal go.dev/issue/79287.
+Instead of trying to add them to the typeparams package API as well,
+just accept their absence in Go 1.26 and older, and their presence
+in Go 1.27 and newer. They were added to make debugging easier and
+aren't otherwise critical.
+
+For golang/go#79287.
+For golang/go#50447.
+For golang/go#79683.
+
+(cherry picked from commit c3855c9e00537f4b655349fe1ea986f1a09e4586)
+Change-Id: I4cf0b83d1bb4a7add3308312e921b340fe54a554
+Reviewed-on: https://go-review.googlesource.com/c/exp/+/783322
+Reviewed-by: Dmitri Shuralyov <dmitshur@google.com>
+LUCI-TryBot-Result: golang-scoped@luci-project-accounts.iam.gserviceaccount.com <golang-scoped@luci-project-accounts.iam.gserviceaccount.com>
+Reviewed-by: Hyang-Ah Hana Kim <hyangah@gmail.com>
+Auto-Submit: Dmitri Shuralyov <dmitshur@golang.org>
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ typeparams/typeparams_test.go | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
+
+diff --git a/typeparams/typeparams_test.go b/typeparams/typeparams_test.go
+index e9a4a5b9..9f7b55f9 100644
+--- a/typeparams/typeparams_test.go
++++ b/typeparams/typeparams_test.go
+@@ -14,7 +14,6 @@ import (
+ 	"go/parser"
+ 	"go/token"
+ 	"go/types"
+-	"strings"
+ 	"testing"
+ )
+ 
+@@ -29,21 +28,38 @@ func TestAPIConsistency(t *testing.T) {
+ 	api118 := getAPI(buildPackage(t, true))
+ 	api117 := getAPI(buildPackage(t, false))
+ 
++	knownMissing := map[string]string{
++		// Go 1.23 has iterator methods that return Seq.
++		// These methods can't be supported at 1.17.
++		"*TypeList.Types":           "func()(Seq[Type])",
++		"*TypeParamList.TypeParams": "func()(Seq[*TypeParam])",
++		"*Union.Terms":              "func()(Seq[*Term])",
++
++		// Go 1.27 added String methods to some types (proposal go.dev/issue/79287).
++		// These could be supported at 1.17 (easily) and at 1.27 (already are).
++		// However, supporting them at 1.26/1.25 is annoying - it would require
++		// replacing type aliases in typeparams_go118.go with copies of the
++		// implementation from 1.26/1.25.
++		"Instance.String":       "func()(string)",
++		"*Instance.String":      "func()(string)",
++		"*TypeList.String":      "func()(string)",
++		"*TypeParamList.String": "func()(string)",
++	}
++
+ 	for name, api := range api117 {
+ 		if api != api118[name] {
+-			t.Errorf("%q: got %s at 1.17, but %s at 1.18+", name, api, api118[name])
++			t.Errorf("%q: got %q at 1.17, but %q at 1.18+", name, api, api118[name])
+ 		}
+ 		delete(api118, name)
+ 	}
+ 	for name, api := range api118 {
+-		// Go 1.23 has iterator methods that return Seq.
+-		// These methods can't be supported at 1.17.
+-		if strings.Contains(api, "Seq") && api117[name] == "" {
++		if api117[name] == "" && knownMissing[name] == api {
++			t.Logf("%q: got %q at 1.18+; known to be missing at 1.17", name, api)
+ 			continue
+ 		}
+ 
+ 		if api != api117[name] {
+-			t.Errorf("%q: got %s at 1.18+, but %s at 1.17", name, api, api117[name])
++			t.Errorf("%q: got %q at 1.18+, but %q at 1.17", name, api, api117[name])
+ 		}
+ 	}
+ }
