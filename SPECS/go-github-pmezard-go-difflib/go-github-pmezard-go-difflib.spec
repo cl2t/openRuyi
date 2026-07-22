@@ -7,15 +7,16 @@
 
 %define _name           go-difflib
 %define go_import_path  github.com/pmezard/go-difflib
+%define commit_id       5d4384ee4fb2527b0a1256a821ebfc92f91efefc
 
 Name:           go-github-pmezard-go-difflib
-Version:        1.0.0
+Version:        1.0.1+git20260721.5d4384e
 Release:        %autorelease
 Summary:        Partial port of Python difflib package to Go
 License:        BSD-3-Clause
 URL:            https://github.com/pmezard/go-difflib
-#!RemoteAsset:  sha256:28f3dc1b5c0efd61203ab07233f774740d3bf08da4d8153fb5310db6cea0ebda
-Source0:        https://github.com/pmezard/go-difflib/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
+#!RemoteAsset:  sha256:b53328c5679cc43d5bac8f0a149b7754f6915fa07533aef904a29e9889264d20
+Source0:        https://github.com/pmezard/go-difflib/archive/%{commit_id}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
