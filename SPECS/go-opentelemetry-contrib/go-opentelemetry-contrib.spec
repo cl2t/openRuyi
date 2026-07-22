@@ -10,20 +10,28 @@
 %define otelhttp_path   instrumentation/net/http/otelhttp
 %define oteltrace_path  instrumentation/net/http/httptrace/otelhttptrace
 
+%define dir_otelgrpc    opentelemetry-go-contrib-instrumentation-google.golang.org-grpc-otelgrpc-v%{version}
+%define dir_otelhttp    opentelemetry-go-contrib-instrumentation-net-http-otelhttp-v%{version}
+%define dir_oteltrace   opentelemetry-go-contrib-instrumentation-net-http-httptrace-otelhttptrace-v%{version}
+
 Name:           go-opentelemetry-contrib
-Version:        0.68.0
+Version:        0.69.0
 Release:        %autorelease
 Summary:        OpenTelemetry instrumentation modules for Go
 License:        Apache-2.0
 URL:            https://github.com/open-telemetry/opentelemetry-go-contrib
-#!RemoteAsset:  sha256:4ad91b08b6700d5803e5758a0bed12223abe7c5c8442d83ffb5abd39b11e33a1
-Source0:        https://github.com/open-telemetry/opentelemetry-go-contrib/archive/refs/tags/instrumentation/net/http/otelhttp/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
-# The upstream repository is a multi-module tree. Package the modules currently
-# needed by prometheus and Google libraries together because they share the same
-# upstream release commit and otelhttptrace has a local replace to otelhttp. - HNO3Miracle
+# The modules are independently tagged at different repository commits, so use
+# each module's exact official tag archive instead of assuming one tag contains
+# the other modules at the same version.
+#!RemoteAsset:  sha256:b37b3916da7ad1eeb6230b20612c01a08a1227977bd02213e1d6c2c5c3c98c98
+Source0:        https://github.com/open-telemetry/opentelemetry-go-contrib/archive/refs/tags/%{otelgrpc_path}/v%{version}.tar.gz#/%{_name}-otelgrpc-%{version}.tar.gz
+#!RemoteAsset:  sha256:323ba7865cfb62bd19a2119bca1b39f5f6d64e3629b010f58d5f6c8a02d3e349
+Source1:        https://github.com/open-telemetry/opentelemetry-go-contrib/archive/refs/tags/%{otelhttp_path}/v%{version}.tar.gz#/%{_name}-otelhttp-%{version}.tar.gz
+#!RemoteAsset:  sha256:f4fe446462d214049ce4a17e77180f473169017ed27be697b8d271827c101560
+Source2:        https://github.com/open-telemetry/opentelemetry-go-contrib/archive/refs/tags/%{oteltrace_path}/v%{version}.tar.gz#/%{_name}-oteltrace-%{version}.tar.gz
 
 BuildRequires:  go
 BuildRequires:  go(github.com/cespare/xxhash/v2)
@@ -51,6 +59,7 @@ BuildRequires:  go(google.golang.org/protobuf)
 BuildRequires:  go(gopkg.in/yaml.v3)
 BuildRequires:  go-rpm-macros
 
+# Keep the umbrella virtual provide used by existing openRuyi consumers.
 Provides:       go(go.opentelemetry.io/contrib) = %{version}
 Provides:       go(go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc) = %{version}
 Provides:       go(go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace) = %{version}
@@ -65,23 +74,38 @@ Requires:       go(google.golang.org/protobuf)
 This package provides selected OpenTelemetry Go contrib instrumentation modules:
 gRPC, HTTP, and HTTP trace instrumentation.
 
+%prep
+%setup -q -c -T -a 0
+%setup -q -D -T -a 1
+%setup -q -D -T -a 2
+
 %install
-for _subdir in %{otelgrpc_path} %{otelhttp_path} %{oteltrace_path}; do
-    install -d "%{buildroot}%{go_sys_gopath}/%{go_import_path}/$(dirname "${_subdir}")"
-    cp -a "${_subdir}" "%{buildroot}%{go_sys_gopath}/%{go_import_path}/${_subdir}"
-done
+install -d %{buildroot}%{go_sys_gopath}/%{go_import_path}/$(dirname %{otelgrpc_path})
+install -d %{buildroot}%{go_sys_gopath}/%{go_import_path}/$(dirname %{otelhttp_path})
+install -d %{buildroot}%{go_sys_gopath}/%{go_import_path}/$(dirname %{oteltrace_path})
+cp -a %{dir_otelgrpc}/%{otelgrpc_path} \
+    %{buildroot}%{go_sys_gopath}/%{go_import_path}/%{otelgrpc_path}
+cp -a %{dir_otelhttp}/%{otelhttp_path} \
+    %{buildroot}%{go_sys_gopath}/%{go_import_path}/%{otelhttp_path}
+cp -a %{dir_oteltrace}/%{oteltrace_path} \
+    %{buildroot}%{go_sys_gopath}/%{go_import_path}/%{oteltrace_path}
 
 %check
 export GO111MODULE=off
 export GOPATH=%{_builddir}/go:%{_datadir}/gocode
 # TestWithSpanNameFormatter expects Go 1.22+ ServeMux pattern matching;
-# OBS currently behaves like httpmuxgo121=1 unless this is forced. - HNO3Miracle
+# force the current behavior in workers that default to httpmuxgo121=1.
 export GODEBUG="${GODEBUG:+${GODEBUG},}httpmuxgo121=0"
-for _subdir in %{otelgrpc_path} %{otelhttp_path} %{oteltrace_path}; do
+for _entry in \
+    "%{dir_otelgrpc}:%{otelgrpc_path}" \
+    "%{dir_otelhttp}:%{otelhttp_path}" \
+    "%{dir_oteltrace}:%{oteltrace_path}"; do
+    _dir=${_entry%%:*}
+    _subdir=${_entry#*:}
     _import_path=%{go_import_path}/${_subdir}
     mkdir -p "%{_builddir}/go/src/$(dirname "${_import_path}")"
     rm -rf "%{_builddir}/go/src/${_import_path}"
-    cp -a "${_subdir}" "%{_builddir}/go/src/${_import_path}"
+    cp -a "${_dir}/${_subdir}" "%{_builddir}/go/src/${_import_path}"
 done
 for _subdir in %{otelgrpc_path} %{otelhttp_path} %{oteltrace_path}; do
     _import_path=%{go_import_path}/${_subdir}
@@ -91,7 +115,7 @@ for _subdir in %{otelgrpc_path} %{otelhttp_path} %{oteltrace_path}; do
 done
 
 %files
-%license LICENSE
+%license %{dir_otelgrpc}/LICENSE
 %{go_sys_gopath}/%{go_import_path}/%{otelgrpc_path}
 %{go_sys_gopath}/%{go_import_path}/%{otelhttp_path}
 %{go_sys_gopath}/%{go_import_path}/%{oteltrace_path}
