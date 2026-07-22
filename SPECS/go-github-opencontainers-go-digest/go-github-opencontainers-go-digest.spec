@@ -6,15 +6,15 @@
 
 %define _name           go-digest
 %define go_import_path  github.com/opencontainers/go-digest
-%define upstream_version  1.0.0-rc1
+%define upstream_version  1.0.0
 
 Name:           go-github-opencontainers-go-digest
-Version:        1.0.0~rc1
+Version:        1.0.0
 Release:        %autorelease
 Summary:        Common digest package used across the container ecosystem
 License:        Apache-2.0 AND CC-BY-SA-4.0
 URL:            https://github.com/opencontainers/go-digest
-#!RemoteAsset:  sha256:3f511b32c46f60482644f0ad6a345f52e672c82164bfb08274f15f7c14cd3076
+#!RemoteAsset:  sha256:1e74706d265c92f62793af741e322163f3c08afa66f5a7926c9b9ccb44fed230
 Source0:        https://github.com/opencontainers/go-digest/archive/refs/tags/v%{upstream_version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -30,7 +30,7 @@ go-digest provides common digest types and helpers for container images.
 %files
 %doc CONTRIBUTING.md
 %doc README.md
-%license LICENSE.code
+%license LICENSE
 %license LICENSE.docs
 %{go_sys_gopath}/%{go_import_path}
 
