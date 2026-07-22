@@ -10,12 +10,12 @@
 %define go_test_exclude_glob github.com/envoyproxy/protoc-gen-validate/tests/harness*
 
 Name:           go-github-envoyproxy-protoc-gen-validate
-Version:        1.3.0
+Version:        1.3.3
 Release:        %autorelease
 Summary:        Protocol Buffer Validation
 License:        Apache-2.0
 URL:            https://github.com/envoyproxy/protoc-gen-validate
-#!RemoteAsset:  sha256:26dc6db523ee943af51fdfc292658a2dbe7046735654f1dc839745988f0fe26b
+#!RemoteAsset:  sha256:9e47ef41ec0e269a173a94b6766cc4be4e1a1098fcda040b2f0441c51bfb6ae2
 Source0:        https://github.com/envoyproxy/protoc-gen-validate/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -45,8 +45,8 @@ they cannot enforce semantic rules for values. This plugin adds support
 to protoc-generated code to validate such constraints.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
