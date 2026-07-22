@@ -6,15 +6,16 @@
 
 %define _name           mmap-go
 %define go_import_path  github.com/edsrzf/mmap-go
+%define commit_id       fad1cd13edbd497452bdeed6b0c029b2d6d38e07
 
 Name:           go-github-edsrzf-mmap-go
-Version:        1.2.0
+Version:        1.2.1+git20260721.fad1cd1
 Release:        %autorelease
 Summary:        A portable mmap package for Go
 License:        BSD-3-Clause
 URL:            https://github.com/edsrzf/mmap-go
-#!RemoteAsset:  sha256:9e92e9a7daeac05b86e15a5cf301767dad5a47648a33e05527911ccfa055d244
-Source0:        https://github.com/edsrzf/mmap-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
+#!RemoteAsset:  sha256:a6884da33d883380d6511d99dc444e1b6c4be9d754ed8f45d1b8bc380c27bf37
+Source0:        https://github.com/edsrzf/mmap-go/archive/%{commit_id}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
