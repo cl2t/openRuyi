@@ -1,0 +1,33 @@
+From e2d547df9bc65bf3ca4c9d809c7b056b1f6f5e61 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20BIDON?= <fredbi@yahoo.com>
+Date: Sat, 22 Aug 2026 14:40:40 +0200
+Subject: [PATCH] fix(hostname): go1.27 idna valid label no longer tolerates
+ trailing dot in hosts
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We keep our existing behavior (follows https://url.spec.whatwg.org/#concept-host-parser)
+and trim any trailing dot before submitting the string to idna label
+check.
+
+[cl2t: Backport only the hostname fix.]
+(cherry picked from commit 43e75f00a0ca0ba96e3f4f484531a7aa52028888)
+Signed-off-by: Frédéric BIDON <fredbi@yahoo.com>
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ default.go | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/default.go b/default.go
+index 87d3856a..5a57b0db 100644
+--- a/default.go
++++ b/default.go
+@@ -119,6 +119,7 @@ func IsHostname(str string) bool {
+ 	}
+ 
+ 	// IDNA check
++	str, _ = strings.CutSuffix(str, ".") // tolerates trailing ".", whereas IDNA ValidateLabel rule does not
+ 	res, err := idnaHostChecker.ToASCII(strings.ToLower(str))
+ 	if err != nil || res == "" {
+ 		return false
