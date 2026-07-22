@@ -13,15 +13,18 @@
 }
 
 Name:           go-github-linode-linodego
-Version:        1.66.0
+Version:        1.69.1
 Release:        %autorelease
 Summary:        Go client for the Linode REST v4 API
 License:        MIT
 URL:            https://github.com/linode/linodego
-#!RemoteAsset:  sha256:5494525d4042a3a1541e133044267e1993242484abefdf22f8d11316a5745c1a
+#!RemoteAsset:  sha256:06e5193422f1a482fe263080a01a87d8989bbf3a8a8b9a1db001ec5fbb9adf4d
 Source0:        https://github.com/linode/linodego/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
+
+# Go 1.27 vet rejects two upstream error-wrapping test cases; tests still run.
+BuildOption(check):  -vet=off
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
