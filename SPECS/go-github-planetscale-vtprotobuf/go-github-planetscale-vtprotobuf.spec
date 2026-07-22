@@ -6,18 +6,19 @@
 
 %define _name           vtprotobuf
 %define go_import_path  github.com/planetscale/vtprotobuf
+%define commit_id       0393e58bdf106fe0347e554d272a8f2c84d12461
 # The conformance test expects an external runner that is not shipped in the
 # source tree: fork/exec conformance/conformance-test-runner: no such file or directory. - HNO3Miracle
 %define go_test_exclude github.com/planetscale/vtprotobuf/conformance
 
 Name:           go-github-planetscale-vtprotobuf
-Version:        0.6.0
+Version:        0.6.1+git20260721.0393e58
 Release:        %autorelease
 Summary:        Protocol buffer compiler plugin for optimized Go code
 License:        BSD-3-Clause
 URL:            https://github.com/planetscale/vtprotobuf
-#!RemoteAsset:  sha256:93ed5268bb2bbfe8c3aef008ba6d977a921b2ec62e7e78c762a8c1ae45c5a49c
-Source0:        https://github.com/planetscale/vtprotobuf/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
+#!RemoteAsset:  sha256:fb2694aeeff0cfbe81f29f971e7179bee098c385c15efc86d3dc3587358f62b7
+Source0:        https://github.com/planetscale/vtprotobuf/archive/%{commit_id}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
