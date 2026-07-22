@@ -1,0 +1,22 @@
+From: cl2t <yihong.or@isrc.iscas.ac.cn>
+Subject: [PATCH] azidentity: avoid archive-incompatible test proxy setup
+
+The upstream TestMain starts the Azure test proxy by locating the git
+repository root and its development certificate. Release archive builds have
+neither. Initialize the fake test values and run the tests directly instead;
+environment-sensitive failures are still tolerated by the spec after a strict
+compile pass.
+---
+ sdk/azidentity/live_test.go | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/sdk/azidentity/live_test.go
++++ b/sdk/azidentity/live_test.go
+@@ -123,5 +123,6 @@
+
+ func TestMain(m *testing.M) {
+-	code := run(m)
++	setFakeValues()
++	code := m.Run()
+ 	os.Exit(code)
+ }

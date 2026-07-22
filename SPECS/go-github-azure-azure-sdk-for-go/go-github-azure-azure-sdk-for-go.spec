@@ -15,17 +15,17 @@
 # sub-module is fetched from its own tag archive (all github.com
 # official sources, no proxy/mirror) and installed into its GOPATH
 # location. The package Version is the date of the newest sub-module
-# tag (azcore v1.21.1, 2026-04-16); every Provides below carries the
+# tag (azidentity v1.14.0, 2026-06-15); every Provides below carries the
 # real upstream version of its sub-module.
 #
 # The five sub-module versions below are the ones pinned by Prometheus' go.mod
-# (v3.12.0); each maps to an upstream git tag "sdk/<module>/v<ver>" in
+# (v3.13.1); each maps to an upstream git tag "sdk/<module>/v<ver>" in
 # github.com/Azure/azure-sdk-for-go (see Source0..4). To bump for a newer
 # Prometheus: read these modules in its go.mod, confirm the matching upstream
 # tags exist, then update the ver_* macros and the #!RemoteAsset sha256 lines.
 # Maintained by hand; go2spec cannot emit a monorepo multi-module spec.
-%define ver_azcore      1.21.1
-%define ver_azidentity  1.13.1
+%define ver_azcore      1.22.0
+%define ver_azidentity  1.14.0
 %define ver_internal    1.12.0
 %define ver_armcompute  5.7.0
 %define ver_armnetwork  4.3.0
@@ -38,7 +38,7 @@
 %define dir_armnetwork  azure-sdk-for-go-sdk-resourcemanager-network-armnetwork-v%{ver_armnetwork}
 
 Name:           go-github-azure-azure-sdk-for-go
-Version:        20260416
+Version:        20260615
 Release:        %autorelease
 Summary:        Azure SDK for Go (azcore, azidentity, internal, armcompute, armnetwork)
 License:        MIT
@@ -46,9 +46,9 @@ URL:            https://github.com/Azure/azure-sdk-for-go
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
-#!RemoteAsset:  sha256:9598f3a622203f68d3710a491b39b0eab77ed46b15146c57d4734fa9aecb87aa
+#!RemoteAsset:  sha256:51b956194c3ef970ac2b2e16c05ee8c44f8cff6ba41428528322d8802630b903
 Source0:        https://github.com/Azure/azure-sdk-for-go/archive/refs/tags/sdk/azcore/v%{ver_azcore}.tar.gz#/%{_name}-azcore-%{ver_azcore}.tar.gz
-#!RemoteAsset:  sha256:a2def29ccc2942e954a05c7444bdcdf94ec5717b642ba7697c320b9f3012eb03
+#!RemoteAsset:  sha256:deb3089903e969f1258bfb3bbed1b612d3c7e75271d444b7ae92bd63638994fb
 Source1:        https://github.com/Azure/azure-sdk-for-go/archive/refs/tags/sdk/azidentity/v%{ver_azidentity}.tar.gz#/%{_name}-azidentity-%{ver_azidentity}.tar.gz
 #!RemoteAsset:  sha256:f41ea792bf28ea6712bb5c24045db49c5a935675d7ac96f935937e7b8aaf7f58
 Source2:        https://github.com/Azure/azure-sdk-for-go/archive/refs/tags/sdk/internal/v%{ver_internal}.tar.gz#/%{_name}-internal-%{ver_internal}.tar.gz
@@ -57,14 +57,13 @@ Source3:        https://github.com/Azure/azure-sdk-for-go/archive/refs/tags/sdk/
 #!RemoteAsset:  sha256:12f987760f5672ad6a188620f1e93e77689a34cb047dfb8e2d4fe00d1814f98d
 Source4:        https://github.com/Azure/azure-sdk-for-go/archive/refs/tags/sdk/resourcemanager/network/armnetwork/v%{ver_armnetwork}.tar.gz#/%{_name}-armnetwork-%{ver_armnetwork}.tar.gz
 
-# Source-only install needs no Go deps; the entries below are only for the
-# %%check tests. azidentity additionally pulls in
-# go(github.com/AzureAD/microsoft-authentication-library-for-go),
-# go(github.com/golang-jwt/jwt/v5) and go(github.com/google/uuid), which are
-# not packaged yet, so they are omitted here and the affected tests are
-# tolerated by %%check (as Requires they are still declared below).
+Patch2000:      2000-disable-azidentity-test-proxy.patch
+
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
+BuildRequires:  go(github.com/AzureAD/microsoft-authentication-library-for-go)
+BuildRequires:  go(github.com/golang-jwt/jwt/v5)
+BuildRequires:  go(github.com/google/uuid)
 BuildRequires:  go(github.com/stretchr/testify)
 BuildRequires:  go(golang.org/x/crypto)
 BuildRequires:  go(golang.org/x/net)
@@ -109,6 +108,8 @@ Provides:       go(github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute
 Provides:       go(github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4) = %{ver_armnetwork}
 
 Requires:       go(github.com/AzureAD/microsoft-authentication-library-for-go)
+Requires:       go(github.com/golang-jwt/jwt/v5)
+Requires:       go(github.com/google/uuid)
 Requires:       go(golang.org/x/crypto)
 Requires:       go(golang.org/x/net)
 Requires:       go(golang.org/x/text)
@@ -127,6 +128,18 @@ clients. Each sub-module is installed under its GOPATH import path.
 %setup -q -D -T -a 2
 %setup -q -D -T -a 3
 %setup -q -D -T -a 4
+%patch -P 2000 -p1 -d %{dir_azidentity}
+# azidentity/cache is an independently versioned optional module. Prometheus
+# does not import it, so do not ship the arbitrary cache snapshot contained in
+# the azidentity tag archive or compile examples that require that module.
+rm -rf %{dir_azidentity}/sdk/azidentity/cache
+rm -f %{dir_azidentity}/sdk/azidentity/example_persistent_cache_*_test.go
+# Resource-manager live tests require the separately versioned internal testutil
+# module and real Azure credentials; neither is part of the reusable clients.
+find %{dir_armcompute}/sdk/resourcemanager/compute/armcompute \
+    -name '*_live_test.go' -delete
+find %{dir_armnetwork}/sdk/resourcemanager/network/armnetwork \
+    -name '*_live_test.go' -delete
 
 %install
 # Install each sub-module subtree into its GOPATH/src import path. The
@@ -145,7 +158,8 @@ cp -a %{dir_armnetwork}/sdk/resourcemanager/network/armnetwork/. \
 
 %check
 %{go_common}
-# Test each sub-module from its installed GOPATH location.
+# Copy every selected module into one GOPATH tree before compiling; azcore and
+# azidentity import the independently tagged sdk/internal module.
 for mod in \
     sdk/azcore \
     sdk/azidentity \
@@ -156,10 +170,18 @@ for mod in \
   dst="%{_builddir}/go/src/%{go_import_path}/$mod"
   mkdir -p "$dst"
   cp -a "$src/." "$dst/"
-  # Run the tests, but disable vet and tolerate known upstream failures:
-  # some sub-module tests need unpackaged deps (e.g. dnaeon/go-vcr,
-  # golang-jwt/jwt/v5) or predate the newer Go toolchain. The library
-  # sources themselves install and compile fine.
+done
+for mod in \
+    sdk/azcore \
+    sdk/azidentity \
+    sdk/internal \
+    sdk/resourcemanager/compute/armcompute/v5 \
+    sdk/resourcemanager/network/armnetwork/v4 ; do
+  dst="%{_builddir}/go/src/%{go_import_path}/$mod"
+  # Compilation must succeed before environment-sensitive tests are tolerated.
+  ( cd "$dst" && %__go test -vet=off -run '^$' %{go_test_flags_default} ./... )
+  # Some Azure integration tests require credentials, network access or local
+  # services unavailable in the isolated build worker.
   ( cd "$dst" && %__go test -vet=off %{go_test_flags_default} ./... ) || :
 done
 
