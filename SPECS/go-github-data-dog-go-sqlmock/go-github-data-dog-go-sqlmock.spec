@@ -7,10 +7,6 @@
 %define _name           go-sqlmock
 %define go_import_path  github.com/DATA-DOG/go-sqlmock
 
-# The orders example deadlocks in Tx.Rollback with Go 1.27 RawBytes locking:
-# TestShouldRefundUserWhenOrderIsCancelled timed out after 1m30s.
-%define go_test_exclude %{go_import_path}/examples/orders
-
 Name:           go-github-data-dog-go-sqlmock
 Version:        1.5.2
 Release:        %autorelease
