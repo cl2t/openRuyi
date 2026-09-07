@@ -12,12 +12,12 @@
 }
 
 Name:           go-github-clipperhouse-displaywidth
-Version:        0.6.2
+Version:        0.11.0
 Release:        %autorelease
 Summary:        Measure the display column width of strings in Go
 License:        MIT
 URL:            https://github.com/clipperhouse/displaywidth
-#!RemoteAsset
+#!RemoteAsset:  sha256:e8c6d58a7acb5295be484034ed08a4256f6c8eaeea9667353b5aadef9c2eaa9e
 Source0:        https://github.com/clipperhouse/displaywidth/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -26,12 +26,10 @@ BuildOption(prep):  -n %{_name}-%{version}
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
-BuildRequires:  go(github.com/clipperhouse/stringish)
 BuildRequires:  go(github.com/clipperhouse/uax29/v2)
 
 Provides:       go(github.com/clipperhouse/displaywidth) = %{version}
 
-Requires:       go(github.com/clipperhouse/stringish)
 Requires:       go(github.com/clipperhouse/uax29/v2)
 
 %description
@@ -39,9 +37,9 @@ A high-performance Go package for measuring the monospace display width
 of strings, UTF-8 bytes, and runes.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog
