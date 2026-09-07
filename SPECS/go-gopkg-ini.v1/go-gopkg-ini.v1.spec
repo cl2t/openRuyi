@@ -27,15 +27,23 @@ BuildRequires:  go(github.com/stretchr/testify)
 BuildRequires:  go(gopkg.in/yaml.v3)
 
 Provides:       go(gopkg.in/ini.v1) = %{version}
+# minio-go/v7 imports github.com/go-ini/ini; same module as gopkg.in/ini.v1.
+Provides:       go(github.com/go-ini/ini) = %{version}
 
 %description
 Package ini provides INI file parsing and writing functionality for Go,
 including section, key, comment, and type-conversion helpers.
 
+%install -a
+# GOPATH alias so github.com/go-ini/ini resolves to gopkg.in/ini.v1.
+install -d -m 0755 %{buildroot}%{go_sys_gopath}/github.com/go-ini
+ln -s ../../%{go_import_path} %{buildroot}%{go_sys_gopath}/github.com/go-ini/ini
+
 %files
 %doc README*
 %license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
+%{go_sys_gopath}/github.com/go-ini/ini
 
 %changelog
 %autochangelog
