@@ -1,0 +1,32 @@
+From: cl2t <yihong.or@isrc.iscas.ac.cn>
+Subject: [PATCH] Fix metadata logging and literal mock-broker errors
+
+The metadata message supplies formatting verbs to Println. Use Printf
+with a newline so broker ID and address are substituted. Report mock
+broker errors through a constant format so percent signs stay literal.
+Both changes also satisfy current Go vet diagnostics.
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+--- a/client.go
++++ b/client.go
+@@ -994,7 +994,7 @@
+ 		if err == nil {
+ 			// When talking to the startup phase of a broker, it is possible to receive an empty metadata set. We should remove that broker and try next broker (https://issues.apache.org/jira/browse/KAFKA-7924).
+ 			if len(response.Brokers) == 0 {
+-				Logger.Println("client/metadata receiving empty brokers from the metadata response when requesting the broker #%d at %s", broker.ID(), broker.addr)
++				Logger.Printf("client/metadata receiving empty brokers from the metadata response when requesting the broker #%d at %s\n", broker.ID(), broker.addr)
+ 				_ = broker.Close()
+ 				client.deregisterBroker(broker)
+ 				continue
+--- a/mockbroker.go
++++ b/mockbroker.go
+@@ -398,7 +398,7 @@
+ 	if isConnectionClosedError(err) {
+ 		return
+ 	}
+-	b.t.Errorf(err.Error())
++	b.t.Errorf("%s", err)
+ }
+ 
+ // NewMockBroker launches a fake Kafka broker. It takes a TestReporter as provided by the
