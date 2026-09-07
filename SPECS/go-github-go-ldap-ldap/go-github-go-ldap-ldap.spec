@@ -6,11 +6,10 @@
 
 %define _name           ldap
 %define go_import_path  github.com/go-ldap/ldap
-# TODO: Test need too much dependencies, add it later - Julian
-%define go_test_exclude_glob %{shrink:
-    github.com/go-ldap/ldap/v3
-    github.com/go-ldap/ldap/v3/gssapi
-}
+# gssapi pulls jcmturner/gokrb5, which is unused by MinIO pkg/v3.
+%define go_test_exclude_glob github.com/go-ldap/ldap/v3/gssapi*
+# Remaining v3 tests dial 127.0.0.1:3389 and fail in the build sandbox.
+%define go_test_ignore_failure 1
 
 Name:           go-github-go-ldap-ldap
 Version:        3.4.13
@@ -25,8 +24,20 @@ BuildSystem:    golangmodules
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
+BuildRequires:  go(github.com/Azure/go-ntlmssp)
+BuildRequires:  go(github.com/go-asn1-ber/asn1-ber)
+BuildRequires:  go(github.com/google/uuid)
+BuildRequires:  go(github.com/stretchr/testify)
+BuildRequires:  go(golang.org/x/crypto)
 
 Provides:       go(github.com/go-ldap/ldap) = %{version}
+# The v3.4.x archive stores the module in v3/; MinIO pkg/v3 imports /v3.
+Provides:       go(github.com/go-ldap/ldap/v3) = %{version}
+
+Requires:       go(github.com/Azure/go-ntlmssp)
+Requires:       go(github.com/go-asn1-ber/asn1-ber)
+Requires:       go(github.com/google/uuid)
+Requires:       go(golang.org/x/crypto)
 
 %description
 Basic LDAP v3 functionality for the GO programming language.
@@ -47,8 +58,8 @@ The library implements the following specifications:
  * (https://datatracker.ietf.org/doc/html/rfc4532) for WhoAmI requests
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
