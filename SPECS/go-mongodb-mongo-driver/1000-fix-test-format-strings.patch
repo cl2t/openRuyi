@@ -1,0 +1,69 @@
+From ae198227f5747ec112fe8cccde0ce6405d282134 Mon Sep 17 00:00:00 2001
+From: Qingyang Hu <103950869+qingyang-hu@users.noreply.github.com>
+Date: Wed, 12 Aug 2026 15:14:35 -0400
+Subject: [PATCH] GODRIVER-4044 Update golang.org/x/text to v0.39.0 and raise
+ minimum Go version to 1.25. (#2522)
+
+[openRuyi: Backport only test diagnostic fixes to v1.17.3; retain its Go version and dependencies.]
+(cherry picked from commit d20c5dbbd8288f43ed462c8aa74edac2d76a3cb7)
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ internal/assert/assertion_compare_test.go | 14 +++++++-------
+ internal/rand/rand_test.go                |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/internal/assert/assertion_compare_test.go b/internal/assert/assertion_compare_test.go
+index ef8862e..15a483d 100644
+--- a/internal/assert/assertion_compare_test.go
++++ b/internal/assert/assertion_compare_test.go
+@@ -61,30 +61,30 @@ func TestCompare(t *testing.T) {
+ 	} {
+ 		resLess, isComparable := compare(currCase.less, currCase.greater, reflect.ValueOf(currCase.less).Kind())
+ 		if !isComparable {
+-			t.Error("object should be comparable for type " + currCase.cType)
++			t.Errorf("object should be comparable for type %s", currCase.cType)
+ 		}
+ 
+ 		if resLess != compareLess {
+-			t.Errorf("object less (%v) should be less than greater (%v) for type "+currCase.cType,
+-				currCase.less, currCase.greater)
++			t.Errorf("object less (%v) should be less than greater (%v) for type %s",
++				currCase.less, currCase.greater, currCase.cType)
+ 		}
+ 
+ 		resGreater, isComparable := compare(currCase.greater, currCase.less, reflect.ValueOf(currCase.less).Kind())
+ 		if !isComparable {
+-			t.Error("object are comparable for type " + currCase.cType)
++			t.Errorf("object should be comparable for type %s", currCase.cType)
+ 		}
+ 
+ 		if resGreater != compareGreater {
+-			t.Errorf("object greater should be greater than less for type " + currCase.cType)
++			t.Errorf("object greater should be greater than less for type %s", currCase.cType)
+ 		}
+ 
+ 		resEqual, isComparable := compare(currCase.less, currCase.less, reflect.ValueOf(currCase.less).Kind())
+ 		if !isComparable {
+-			t.Error("object are comparable for type " + currCase.cType)
++			t.Errorf("object should be comparable for type %s", currCase.cType)
+ 		}
+ 
+ 		if resEqual != 0 {
+-			t.Errorf("objects should be equal for type " + currCase.cType)
++			t.Errorf("objects should be equal for type %s", currCase.cType)
+ 		}
+ 	}
+ }
+diff --git a/internal/rand/rand_test.go b/internal/rand/rand_test.go
+index 952ce2e..6dee991 100644
+--- a/internal/rand/rand_test.go
++++ b/internal/rand/rand_test.go
+@@ -80,7 +80,7 @@ func checkSampleDistribution(t *testing.T, samples []float64, expected *statsRes
+ 	actual := getStatsResults(samples)
+ 	err := actual.checkSimilarDistribution(expected)
+ 	if err != nil {
+-		t.Errorf(err.Error())
++		t.Error(err)
+ 	}
+ }
