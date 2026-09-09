@@ -1,0 +1,60 @@
+From f72bdb909e39a11ede21f81d6296d980ab0677f8 Mon Sep 17 00:00:00 2001
+From: cl2t <yihong.or@isrc.iscas.ac.cn>
+Date: Wed, 9 Sep 2026 09:57:30 +0800
+Subject: [PATCH] tests: support current Go URL errors and content lengths
+
+Check the structured URL parsing error instead of its Go-version-dependent
+rendering. Encode the Content-Length fixture as decimal digits instead of
+a single rune. Production code is unchanged.
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ pkg/credentials/iam_aws_test.go           | 6 ++++--
+ pkg/s3signer/request-signature-v4_test.go | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/pkg/credentials/iam_aws_test.go b/pkg/credentials/iam_aws_test.go
+index 2015146..f11a6a4 100644
+--- a/pkg/credentials/iam_aws_test.go
++++ b/pkg/credentials/iam_aws_test.go
+@@ -24,6 +24,7 @@ import (
+ 	"io/ioutil"
+ 	"net/http"
+ 	"net/http/httptest"
++	"net/url"
+ 	"os"
+ 	"testing"
+ 	"time"
+@@ -135,8 +136,9 @@ func TestIAMMalformedEndpoint(t *testing.T) {
+ 	if err == nil {
+ 		t.Fatal("Unexpected should fail here")
+ 	}
+-	if err.Error() != `parse %%%%: invalid URL escape "%%%"` {
+-		t.Fatalf("Expected parse %%%%%%%%: invalid URL escape \"%%%%%%\", got %s", err)
++	parseErr, ok := err.(*url.Error)
++	if !ok || parseErr.Op != "parse" || parseErr.URL != "%%%%" || parseErr.Err != url.EscapeError("%%%") {
++		t.Fatalf("Expected URL parse error for invalid escape, got %v", err)
+ 	}
+ }
+ 
+diff --git a/pkg/s3signer/request-signature-v4_test.go b/pkg/s3signer/request-signature-v4_test.go
+index d0c9e30..33cb8b9 100644
+--- a/pkg/s3signer/request-signature-v4_test.go
++++ b/pkg/s3signer/request-signature-v4_test.go
+@@ -20,6 +20,7 @@ package s3signer
+ import (
+ 	"io"
+ 	"net/http"
++	"strconv"
+ 	"strings"
+ 	"testing"
+ )
+@@ -42,7 +43,7 @@ func buildRequest(serviceName, region, body string) (*http.Request, io.ReadSeeke
+ 	req.URL.Opaque = "//example.org/bucket/key-._~,!@#$%^&*()"
+ 	req.Header.Add("X-Amz-Target", "prefix.Operation")
+ 	req.Header.Add("Content-Type", "application/x-amz-json-1.0")
+-	req.Header.Add("Content-Length", string(len(body)))
++	req.Header.Add("Content-Length", strconv.Itoa(len(body)))
+ 	req.Header.Add("X-Amz-Meta-Other-Header", "some-value=!@#$%^&* (+)")
+ 	req.Header.Add("X-Amz-Meta-Other-Header_With_Underscore", "some-value=!@#$%^&* (+)")
+ 	req.Header.Add("X-amz-Meta-Other-Header_With_Underscore", "some-value=!@#$%^&* (+)")
