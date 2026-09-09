@@ -1,0 +1,79 @@
+From 0a781c512c247085236b72a4f3a7025690c3826b Mon Sep 17 00:00:00 2001
+From: Montana Flynn <montana949@gmail.com>
+Date: Sat, 11 Apr 2026 22:48:25 -0500
+Subject: [PATCH] fix: use math.Round to avoid ARM64 FMA fusion miscompile
+ (#97)
+
+Round() rolled its own rounding using math.Modf(input*precision) and
+then comparing the fractional part against 0.5. On Go 1.26+ darwin/arm64
+(and other ARM64 targets), the compiler inlines math.Modf and fuses the
+multiplication with the subtraction inside Modf into a single FMSUB
+instruction. This computes (input*precision - intPart) in extended
+precision, skipping the intermediate float64 rounding.
+
+For Round(5.55, 1):
+  - 5.55 in float64 is actually 5.5499999999999998223...
+  - The float64-rounded product 5.55 * 10 is exactly 55.5
+  - But FMSUB(5.55, 10, 55) = 0.4999999999999982236..., not 0.5
+  - 0.4999... < 0.5, so the function floored to 55 and returned 5.5
+    instead of the expected 5.6
+
+This is documented Go spec behavior (operations may be fused across
+statements; see https://go.dev/ref/spec#Arithmetic_operators), and the
+amd64 backend just happens not to fuse this particular pattern, which
+is why TestRound passed on CI but failed on Apple Silicon.
+
+Replace the hand-rolled algorithm with math.Round (added in Go 1.10,
+well below this module's go 1.13 floor). math.Round implements
+half-away-from-zero rounding via bit manipulation and is correct on all
+architectures. Verified that all existing TestRound cases still pass
+and that no other behavior changes (the only diffs vs. the old impl
+were the two FMA-broken cases Round(5.55, 1) and Round(-5.55, 1),
+which now correctly return 5.6 and -5.6).
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ round.go | 28 +---------------------------
+ 1 file changed, 1 insertion(+), 27 deletions(-)
+
+diff --git a/round.go b/round.go
+index b66779c..7e122a6 100644
+--- a/round.go
++++ b/round.go
+@@ -4,35 +4,9 @@ import "math"
+ 
+ // Round a float to a specific decimal place or precision
+ func Round(input float64, places int) (rounded float64, err error) {
+-
+-	// If the float is not a number
+ 	if math.IsNaN(input) {
+ 		return math.NaN(), NaNErr
+ 	}
+-
+-	// Find out the actual sign and correct the input for later
+-	sign := 1.0
+-	if input < 0 {
+-		sign = -1
+-		input *= -1
+-	}
+-
+-	// Use the places arg to get the amount of precision wanted
+ 	precision := math.Pow(10, float64(places))
+-
+-	// Find the decimal place we are looking to round
+-	digit := input * precision
+-
+-	// Get the actual decimal number as a fraction to be compared
+-	_, decimal := math.Modf(digit)
+-
+-	// If the decimal is less than .5 we round down otherwise up
+-	if decimal >= 0.5 {
+-		rounded = math.Ceil(digit)
+-	} else {
+-		rounded = math.Floor(digit)
+-	}
+-
+-	// Finally we do the math to actually create a rounded number
+-	return rounded / precision * sign, nil
++	return math.Round(input*precision) / precision, nil
+ }

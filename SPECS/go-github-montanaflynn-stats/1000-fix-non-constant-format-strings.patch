@@ -1,0 +1,27 @@
+From 2193b43bf0078fc9d24a55a739ef66fc7f11c32a Mon Sep 17 00:00:00 2001
+From: cl2t <91820982+cl2t@users.noreply.github.com>
+Date: Mon, 14 Sep 2026 05:03:00 +0800
+Subject: [PATCH] test: use Error in TestExponentialRegressionYCoordErr (#136)
+
+Report the error value directly instead of treating its text as a printf
+format. This avoids the non-constant format diagnostic in recent Go
+GOPATH builds without changing the test condition.
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ regression_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/regression_test.go b/regression_test.go
+index 4a37edd..a018392 100644
+--- a/regression_test.go
++++ b/regression_test.go
+@@ -130,7 +130,7 @@ func TestExponentialRegressionYCoordErr(t *testing.T) {
+ 	c := []stats.Coordinate{{1, -5}, {4, 25}, {6, 5}}
+ 	_, err := stats.ExponentialRegression(c)
+ 	if err != stats.YCoordErr {
+-		t.Errorf(err.Error())
++		t.Error(err)
+ 	}
+ }
+ 
