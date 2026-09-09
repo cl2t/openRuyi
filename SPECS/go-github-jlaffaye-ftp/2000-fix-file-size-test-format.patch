@@ -1,0 +1,26 @@
+From 98a78373e48a3d15daf150900a3e520e9d9dd952 Mon Sep 17 00:00:00 2001
+From: cl2t <yihong.or@isrc.iscas.ac.cn>
+Date: Wed, 9 Sep 2026 09:57:30 +0800
+Subject: [PATCH] tests: use integer format for file sizes
+
+The file size is int64. Use a decimal format in the failure message so
+current go vet accepts the test. Production code is unchanged.
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ client_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client_test.go b/client_test.go
+index 4e6bb42..8b81a65 100644
+--- a/client_test.go
++++ b/client_test.go
+@@ -118,7 +118,7 @@ func testConn(t *testing.T, disableEPSV bool) {
+ 		t.Error(err)
+ 	}
+ 	if fileSize != 42 {
+-		t.Errorf("file size %q, expected %q", fileSize, 42)
++		t.Errorf("file size %d, expected %d", fileSize, 42)
+ 	}
+ 
+ 	_, err = c.FileSize("not-found")
