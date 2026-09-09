@@ -1,0 +1,46 @@
+From e66cc6e8f78293c54c587cd7c3a0678be2f00d62 Mon Sep 17 00:00:00 2001
+From: Abhijeet <abhijeet.v@hashicorp.com>
+Date: Thu, 19 Jun 2025 09:58:09 +0530
+Subject: [PATCH] fix lint errors and run linter as part of acceptance tests
+ (#647)
+
+* fix staticcheck, unused linter issues
+
+* fix errcheck linter errors
+
+* run linter as part of ci, cleanup yaml file
+
+[openRuyi: Backport only the non-constant format-string fixes to v1.3.11.]
+(cherry picked from commit 91b5fb845d90bb183a64ef3444933b4ef108d77c)
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ net_transport.go | 2 +-
+ raft_test.go     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net_transport.go b/net_transport.go
+index 2e98bd3..933eae3 100644
+--- a/net_transport.go
++++ b/net_transport.go
+@@ -694,7 +694,7 @@ func decodeResponse(conn *netConn, resp interface{}) (bool, error) {
+ 
+ 	// Format an error if any
+ 	if rpcError != "" {
+-		return true, fmt.Errorf(rpcError)
++		return true, errors.New(rpcError)
+ 	}
+ 	return true, nil
+ }
+diff --git a/raft_test.go b/raft_test.go
+index 84234e7..5d8385d 100644
+--- a/raft_test.go
++++ b/raft_test.go
+@@ -1714,7 +1714,7 @@ func TestRaft_Barrier(t *testing.T) {
+ 	// Ensure all the logs are the same
+ 	c.EnsureSame(t)
+ 	if len(getMockFSM(c.fsms[0]).logs) != 100 {
+-		t.Fatalf(fmt.Sprintf("Bad log length: %d", len(getMockFSM(c.fsms[0]).logs)))
++		t.Fatalf("Bad log length: %d", len(getMockFSM(c.fsms[0]).logs))
+ 	}
+ }

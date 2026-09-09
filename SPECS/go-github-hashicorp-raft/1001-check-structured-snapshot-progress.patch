@@ -1,0 +1,97 @@
+From c5047ea3bb825a58faf5698225c37d6bb3c20c11 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Tue, 28 Mar 2023 09:56:50 -0400
+Subject: [PATCH] Bump github.com/hashicorp/go-hclog from 0.9.1 to 1.5.0 (#551)
+
+* Bump github.com/hashicorp/go-hclog from 0.9.1 to 1.5.0
+
+Bumps [github.com/hashicorp/go-hclog](https://github.com/hashicorp/go-hclog) from 0.9.1 to 1.5.0.
+- [Release notes](https://github.com/hashicorp/go-hclog/releases)
+- [Commits](https://github.com/hashicorp/go-hclog/compare/v0.9.1...v1.5.0)
+
+---
+updated-dependencies:
+- dependency-name: github.com/hashicorp/go-hclog
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+* Fix snapshot restore progress test
+
+Using structured logs to prevent future changes to log attribute output format from breaking things again.
+
+---------
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+Co-authored-by: Matt Keeler <mjkeeler7@gmail.com>
+
+[openRuyi: Backport only the structured-log snapshot progress test; use distribution go-hclog.]
+(cherry picked from commit 34bcd7c1a2562ded402f4bf1f22e7702171516ef)
+
+Signed-off-by: cl2t <yihong.or@isrc.iscas.ac.cn>
+---
+ raft_test.go | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/raft_test.go b/raft_test.go
+index 5d8385d..80b1d77 100644
+--- a/raft_test.go
++++ b/raft_test.go
+@@ -1,8 +1,8 @@
+ package raft
+ 
+ import (
+-	"bufio"
+ 	"bytes"
++	"encoding/json"
+ 	"errors"
+ 	"fmt"
+ 	"io/ioutil"
+@@ -1068,9 +1068,10 @@ func TestRaft_SnapshotRestore_Progress(t *testing.T) {
+ 	// Intercept logs and look for specific log messages.
+ 	var logbuf lockedBytesBuffer
+ 	cfg.Logger = hclog.New(&hclog.LoggerOptions{
+-		Name:   "test",
+-		Level:  hclog.Info,
+-		Output: &logbuf,
++		Name:       "test",
++		JSONFormat: true,
++		Level:      hclog.Info,
++		Output:     &logbuf,
+ 	})
+ 	r, err := NewRaft(&cfg, r.fsm, r.logs, r.stable, r.snapshots, trans2)
+ 	if err != nil {
+@@ -1084,14 +1085,26 @@ func TestRaft_SnapshotRestore_Progress(t *testing.T) {
+ 	}
+ 
+ 	{
+-		scan := bufio.NewScanner(strings.NewReader(logbuf.String()))
++		dec := json.NewDecoder(strings.NewReader(logbuf.String()))
++
+ 		found := false
+-		for scan.Scan() {
+-			line := scan.Text()
+-			if strings.Contains(line, "snapshot restore progress") && strings.Contains(line, "percent-complete=100.00%") {
++
++		type partialRecord struct {
++			Message         string `json:"@message"`
++			PercentComplete string `json:"percent-complete"`
++		}
++
++		for !found {
++			var record partialRecord
++			if err := dec.Decode(&record); err != nil {
++				t.Fatalf("error while decoding json logs: %v", err)
++			}
++
++			if record.Message == "snapshot restore progress" && record.PercentComplete == "100.00%" {
+ 				found = true
+ 				break
+ 			}
++
+ 		}
+ 		if !found {
+ 			t.Fatalf("could not find a log line indicating that snapshot restore progress was being logged")
