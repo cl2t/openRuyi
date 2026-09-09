@@ -6,8 +6,6 @@
 
 %define _name           pb
 %define go_import_path  github.com/cheggaaa/pb
-# Failure on newer version test? Why? - Julian
-%define go_test_exclude github.com/cheggaaa/pb/v3
 
 Name:           go-github-cheggaaa-pb-v1
 Version:        1.0.30
@@ -25,19 +23,25 @@ BuildRequires:  go-rpm-macros
 BuildRequires:  go(github.com/fatih/color)
 BuildRequires:  go(github.com/mattn/go-colorable)
 BuildRequires:  go(github.com/mattn/go-runewidth)
+BuildRequires:  go(golang.org/x/sys)
 
 Provides:       go(github.com/cheggaaa/pb) = %{version}
 
 Requires:       go(github.com/fatih/color)
 Requires:       go(github.com/mattn/go-colorable)
 Requires:       go(github.com/mattn/go-runewidth)
+Requires:       go(golang.org/x/sys)
 
 %description
 Terminal progress bar for Go
 
+%prep -a
+# The v3 module is packaged separately.
+rm -rf v3
+
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
