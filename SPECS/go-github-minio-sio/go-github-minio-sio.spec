@@ -24,7 +24,11 @@ BuildRequires:  go(golang.org/x/crypto)
 BuildRequires:  go(golang.org/x/sys)
 BuildRequires:  go(golang.org/x/term)
 
-Provides:       go(github.com/minio/minio-sio) = %{version}
+Provides:       go(github.com/minio/sio) = %{version}
+
+Requires:       go(golang.org/x/crypto)
+Requires:       go(golang.org/x/sys)
+Requires:       go(golang.org/x/term)
 
 %description
 Secure IO
@@ -41,8 +45,8 @@ sophisticated attacks. Anyone who has access to the stored data can try
 to manipulate the data - even if the data is encrypted.
 
 %files
-%license LICENSE*
 %doc README*
+%license LICENSE*
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
