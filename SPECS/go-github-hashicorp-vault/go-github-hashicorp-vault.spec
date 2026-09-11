@@ -18,8 +18,8 @@ Source0:        https://github.com/hashicorp/vault/archive/refs/tags/api/v%{vers
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
-# Treat server-provided errors as text, preserving percent signs.
-Patch2000:      2000-preserve-literal-server-errors.patch
+# Backport the API error fix from https://github.com/hashicorp/vault/pull/29412.
+Patch1000:      1000-backport-parse-secret-error-fix.patch
 
 BuildRequires:  go
 BuildRequires:  go-rpm-macros
@@ -43,6 +43,8 @@ BuildRequires:  go(golang.org/x/net)
 BuildRequires:  go(golang.org/x/time)
 
 Provides:       go(github.com/hashicorp/vault/api) = %{version}
+Provides:       go(github.com/hashicorp/vault/api/cliconfig) = %{version}
+Provides:       go(github.com/hashicorp/vault/api/tokenhelper) = %{version}
 
 Requires:       go(github.com/cenkalti/backoff/v3)
 Requires:       go(github.com/go-jose/go-jose/v4)
